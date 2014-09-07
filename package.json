@@ -1,0 +1,24 @@
+{
+  "name": "annie",
+  "version": "0.0.1",
+  "description": "HTTP and browser toolkit",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {
+    "propertize": "~1"
+  },
+  "devDependencies": {
+    "mocha": "~1",
+    "expect.js": "~0.3"
+  },
+  "keywords": [
+    "user agent",
+    "request",
+    "response",
+    "client"
+  ],
+  "author": "Richard Remer (reanjr@gmail.com)",
+  "license": "MIT"
+}
