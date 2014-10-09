@@ -84,6 +84,21 @@ describe("annie", function() {
             expect(req.userAgent).to.be(ua);
             expect(req.session).to.be(session);
         });
+        
+        describe(".getHeaderString", function() {
+            it("should return headers in HTTP format", function() {
+                var req = annie.createRequest(),
+                    headers;
+                    
+                req.addHeader("foo", "you");
+                req.addHeader("bar", "baz");
+                headers = req.getHeaderString();
+                
+                expect(headers).to.contain("foo: you");
+                expect(headers).to.contain("bar: baz");
+                expect(headers).to.contain("\r\n");
+            });
+        });
     });
 
     describe(".HttpResponse", function() {
