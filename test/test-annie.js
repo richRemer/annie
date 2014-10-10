@@ -112,5 +112,18 @@ describe("annie", function() {
             expect(res.session).to.be(session);
             expect(res.request).to.be(req);
         });
+        
+        describe(".statusLine", function() {
+            it("should derive from response status", function() {
+                var req = annie.createRequest(),
+                    res = new HttpResponse(req);
+                
+                res.version = "1.0";
+                res.status = 404;
+                expect(res.statusLine).to.be("HTTP/1.0 404 Not Found");
+                res.status = 200;
+                expect(res.statusLine).to.be("HTTP/1.0 200 OK");
+            });
+        });
     });
 });

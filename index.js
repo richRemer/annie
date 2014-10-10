@@ -1,4 +1,5 @@
-var UserAgent = require("./lib/user-agent"),
+var http = require("http"),
+    UserAgent = require("./lib/user-agent"),
     Session = require("./lib/session"),
     HttpRequest = require("./lib/http-request"),
     HttpResponse = require("./lib/http-response");
@@ -36,5 +37,7 @@ module.exports = {
     UserAgent: UserAgent,
     Session: Session,
     HttpRequest: HttpRequest,
-    HttpResponse: HttpResponse
+    HttpResponse: HttpResponse,
+    
+    STATUS_CODES: http.STATUS_CODES
 };
