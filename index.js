@@ -4,35 +4,11 @@ var http = require("http"),
     HttpRequest = require("./lib/http-request"),
     HttpResponse = require("./lib/http-response");
 
-/**
- * Create a new UserAgent object.
- * @returns {UserAgent}
- */
-function createUserAgent() {
-    return new UserAgent();
-}
-
-/**
- * Create a new Session object using a default UserAgent.
- * @returns {Session}
- */
-function createSession() {
-    return createUserAgent().createSession();
-}
-
-/**
- * Create a new HttpRequest object using a default UserAgent and a new Session.
- * @returns {HttpRequest}
- */
-function createRequest() {
-    return createUserAgent().createRequest();
-}
-
 /** module exports */
 module.exports = {
-    createUserAgent: createUserAgent,
-    createSession: createSession,
-    createRequest: createRequest,
+    createUserAgent: UserAgent.create,
+    createSession: Session.create,
+    createRequest: HttpRequest.create,
     
     UserAgent: UserAgent,
     Session: Session,

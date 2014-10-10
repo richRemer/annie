@@ -1,7 +1,7 @@
 {
   "name": "annie",
   "version": "0.0.1",
-  "description": "HTTP and browser toolkit",
+  "description": "HTTP client toolkit",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
@@ -17,7 +17,9 @@
     "user agent",
     "request",
     "response",
-    "client"
+    "session",
+    "cookie",
+    "rest"
   ],
   "author": "Richard Remer (reanjr@gmail.com)",
   "license": "MIT"
