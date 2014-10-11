@@ -8,9 +8,9 @@ Quick Examples
 --------------
 
 The quickest way to understand `annie` is by checking out an example.  For this
-example, you must get an authorization token from a web service, then use that
-token to update an entity.  You decide to wrap this in a function called
-`updateEntity`.
+example, imagine you must make a POST to a web service to get an authorization
+token, passing credentials in the headers.  You must then use that token to
+update an entity.  You decide to wrap this in a function called `updateEntity`.
 
 ```js
 var annie = require("annie");
@@ -18,18 +18,35 @@ const AUTH_URL = "https://example.com/...",
       AUTH_IDENT = "ServiceUser",
       AUTH_SECRET = "P455wurd";
 
+/**
+ * Update an existing resource entity, changing a single key to a new value.
+ * @param {string} entityUri    URI of the resource entity
+ * @param {string} key          Entity key to update
+ * @param {*} val               New value for the key
+ * @param {function} done       Called with (err, entity)
+ */
 function updateEntity(entityUri, key, val, done) {
     var headers = {"X-Ident": AUTH_IDENT, "X-Secret": AUTH_SECRET};
- 
+
+    // POST credentials to authentication service and handle success (2xx)
     annie.post(AUTH_URL, headers, function(res) {
         headers = {"X-Token": res.getHeader("X-Token")};
+
+        // GET existing resource entity and update the key/val
         annie.get(entityUri, headers, function(res) {
             var entity = JSON.parse(res.data);
             entity[key] = val;
             headers["If-Match"] = res.getHeader("ETag");
-            annie.put(entity, entityUri, headers).exec(done);
+            
+            // conditional PUT to update resource entity
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });
         });
-    });
+    })
+    
+    // pass along any js/HTTP errors
+    .fail(done);      // pass along any failures to the callback
 }
 ```
 
