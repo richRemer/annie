@@ -15,27 +15,22 @@ token to update an entity.  You decide to wrap this in a function called
 ```js
 var annie = require("annie");
 const AUTH_URL = "https://example.com/...",
-      AUTH_LOGIN = "ServiceUser",
-      AUTH_PASSWD = "S3kr3T";
+      AUTH_IDENT = "ServiceUser",
+      AUTH_SECRET = "P455wurd";
 
 function updateEntity(entityUri, key, val, done) {
-    var login = {"X-Login": AUTH_LOGIN, "X-Passwd": AUTH_PASSWD},
-        entity;
-        
-    annie.createSession()
-        .post(AUTH_URL, login, function(res) {
-            res.exportHeader("X-Auth-Token");
-        })
-        .get(entityUri, function(res) {
-            entity = JSON.parse(res.data);
+    var headers = {"X-Ident": AUTH_IDENT, "X-Secret": AUTH_SECRET};
+ 
+    annie.post(AUTH_URL, headers, function(res) {
+        headers = {"X-Token": res.getHeader("X-Token")};
+        annie.get(entityUri, headers, function(res) {
+            var entity = JSON.parse(res.data);
             entity[key] = val;
-        })
-        .put(entityUri, {}).data(entity)
-        .exec(done);
+            headers["If-Match"] = res.getHeader("ETag");
+            annie.put(entity, entityUri, headers).exec(done);
+        });
+    });
 }
-
-annie.post("http://example.com/auth").
-
 ```
 
 UserAgent
