@@ -46,7 +46,7 @@ function updateEntity(entityUri, key, val, done) {
     })
     
     // pass along any js/HTTP errors
-    .fail(done);      // pass along any failures to the callback
+    .fail(done);
 }
 ```
 
@@ -130,7 +130,7 @@ An `HttpResponse` object is created by calling the `send` method of a configured
 var req = annie.createRequest();
 
 req.host = "example.com";
-req.uri = "/";
+req.path = "/";
 req.send(function(err, res) {
     if (err) throw err;
     console.log(res);
