@@ -41,10 +41,13 @@ describe("UserAgent", function() {
     describe(".createRequest", function() {
         it("should return an HttpRequest", function() {
             var ua = annie.createUserAgent(),
-                req = ua.createRequest();
-                
+                entity = JSON.stringify({foo: 42}),
+                req = ua.createRequest("PUT", entity, "http://example.com");
+            
             expect(req).to.be.an(HttpRequest);
             expect(req.userAgent).to.be(ua);
+            expect(req.host).to.be("example.com");
+            expect(JSON.parse(req.data).foo).to.be(42);
         });
     });        
 });
@@ -67,11 +70,15 @@ describe("Session", function() {
         it("should return an HttpRequest", function() {
             var ua = annie.createUserAgent(),
                 session = ua.createSession(),
-                req = session.createRequest();
+                entity = JSON.stringify({foo: 42}),
+                uri = "http://example.com",
+                req = session.createRequest("PUT", entity, uri);
                 
             expect(req).to.be.an(HttpRequest);
             expect(req.session).to.be(session);
             expect(req.userAgent).to.be(ua);
+            expect(req.host).to.be("example.com");
+            expect(JSON.parse(req.data).foo).to.be(42);
         });
     });
 });
