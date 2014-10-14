@@ -1,19 +1,19 @@
 var http = require("http"),
     UserAgent = require("./lib/user-agent"),
     Session = require("./lib/session"),
-    HttpRequest = require("./lib/http-request"),
-    HttpResponse = require("./lib/http-response");
+    Request = require("./lib/request"),
+    Response = require("./lib/response");
 
 /** module exports */
 module.exports = {
     createUserAgent: UserAgent.create,
     createSession: Session.create,
-    createRequest: HttpRequest.create,
+    createRequest: Request.create,
     
     UserAgent: UserAgent,
     Session: Session,
-    HttpRequest: HttpRequest,
-    HttpResponse: HttpResponse,
+    Request: Request,
+    Response: Response,
     
     STATUS_CODES: http.STATUS_CODES
 };

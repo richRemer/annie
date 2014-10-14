@@ -1,8 +1,7 @@
 annie HTTP Client Library
 =========================
 The `annie` library provides objects for making HTTP requests.  It includes
-several classes: `UserAgent`, `Session`, `Message`, `HttpRequest`, and
-`HttpResponse`.
+several classes: `UserAgent`, `Session`, `Message`, `Request`, and `Response`.
 
 Quick Examples
 --------------
@@ -96,11 +95,11 @@ sess = new annie.Session(ua);
 sess = annie.createSession();   // default UserAgent
 ```
 
-HttpRequest
------------
-The `HttpRequest` class issues requests and produces `HttpResponse` objects.
+Request
+-------
+The `Request` class issues requests and produces `Response` objects.
 
-### Creating an `HttpRequest`
+### Creating an `Request`
 
 ```js
 var annie = require("annie"),
@@ -109,7 +108,7 @@ var annie = require("annie"),
 // create request - object style
 ua = new annie.UserAgent();
 sess = new annie.Session(ua);
-req = new annie.HttpRequest(sess);
+req = new annie.Request(sess);
 
 // create requests - function style
 req = annie.createRequest();    // default UserAgent with a new Session
@@ -119,12 +118,12 @@ sess = annie.createSession();
 req = sess.createRequest();
 ```
 
-HttpResponse
-------------
-An `HttpResponse` object is created by calling the `send` method of a configured
-`HttpRequest` object.
+Response
+--------
+An `Response` object is created by calling the `send` method of a configured
+`Request` object.
 
-### Getting an `HttpResponse`
+### Getting an `Response`
 
 ```js
 var req = annie.createRequest();

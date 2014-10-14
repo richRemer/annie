@@ -2,8 +2,8 @@ var http = require("http"),
     annie = require(".."),
     UserAgent = require("../lib/user-agent"),
     Session = require("../lib/session"),
-    HttpRequest = require("../lib/http-request"),
-    HttpResponse = require("../lib/http-response"),
+    Request = require("../lib/request"),
+    Response = require("../lib/response"),
     expect = require("expect.js");
     
 describe("annie", function() {
@@ -15,8 +15,8 @@ describe("annie", function() {
         expect(annie.createSession).to.be(Session.create);
     });
     
-    it("should export HttpRequest.create as createRequest", function() {
-        expect(annie.createRequest).to.be(HttpRequest.create);
+    it("should export Request.create as createRequest", function() {
+        expect(annie.createRequest).to.be(Request.create);
     });
 });
 
@@ -38,12 +38,12 @@ describe("UserAgent", function() {
     });
 
     describe(".createRequest", function() {
-        it("should return an HttpRequest", function() {
+        it("should return an Request", function() {
             var ua = annie.createUserAgent(),
                 entity = JSON.stringify({foo: 42}),
                 req = ua.createRequest("PUT", entity, "http://example.com");
             
-            expect(req).to.be.an(HttpRequest);
+            expect(req).to.be.an(Request);
             expect(req.userAgent).to.be(ua);
             expect(req.host).to.be("example.com");
             expect(JSON.parse(req.data).foo).to.be(42);
@@ -79,14 +79,14 @@ describe("Session", function() {
     });
 
     describe(".createRequest", function() {
-        it("should return an HttpRequest", function() {
+        it("should return an Request", function() {
             var ua = annie.createUserAgent(),
                 session = ua.createSession(),
                 entity = JSON.stringify({foo: 42}),
                 uri = "http://example.com",
                 req = session.createRequest("PUT", entity, uri);
                 
-            expect(req).to.be.an(HttpRequest);
+            expect(req).to.be.an(Request);
             expect(req.session).to.be(session);
             expect(req.userAgent).to.be(ua);
             expect(req.host).to.be("example.com");
@@ -95,10 +95,10 @@ describe("Session", function() {
     });
 });
 
-describe("HttpRequest", function() {
+describe("Request", function() {
     it("should accept a UserAgent param to constructor", function() {
         var ua = annie.createUserAgent(),
-            req = new HttpRequest(ua);
+            req = new Request(ua);
         
         expect(req.userAgent).to.be(ua);
         expect(req.session).to.be.ok();
@@ -107,27 +107,27 @@ describe("HttpRequest", function() {
     it("should accept a Session param to constructor", function() {
         var ua = annie.createUserAgent(),
             session = ua.createSession(),
-            req = new HttpRequest(session);
+            req = new Request(session);
         
         expect(req.userAgent).to.be(ua);
         expect(req.session).to.be(session);
     });
     
     describe(".create", function() {
-        it("should return a new HttpRequest instance", function() {
-            expect(HttpRequest.create()).to.be.an(HttpRequest);
+        it("should return a new Request instance", function() {
+            expect(Request.create()).to.be.an(Request);
         });
         
         describe("(string)", function() {
             it("should set the request URI", function() {
-                var req = HttpRequest.create("http://example.com/foo?bar");
+                var req = Request.create("http://example.com/foo?bar");
                 expect(req.uri).to.be("http://example.com/foo?bar");
             });
         });
         
         describe("(string, string)", function() {
             it("should set the request method and URL", function() {
-                var req = HttpRequest.create("POST", "http://example.com/foo");
+                var req = Request.create("POST", "http://example.com/foo");
                 expect(req.method).to.be("POST");
                 expect(req.host).to.be("example.com");
             });
@@ -138,7 +138,7 @@ describe("HttpRequest", function() {
                 var method = "POST",
                     data = "Blargh!",
                     url = "http://example.com/foo",
-                    req = HttpRequest.create(method, data, url);
+                    req = Request.create(method, data, url);
 
                 expect(req.method).to.be(method);
                 expect(req.data).to.be(data);
@@ -150,7 +150,7 @@ describe("HttpRequest", function() {
             it("should set request headers", function() {
                 var headers = {"Content-Type": "text/xml"},
                     url = "http://example.com/foo",
-                    req = HttpRequest.create(url, headers);
+                    req = Request.create(url, headers);
                 
                 expect(req.getHeader("Content-Type")).to.be("text/xml");
                 expect(req.host).to.be("example.com");
@@ -221,12 +221,12 @@ describe("HttpRequest", function() {
     });
 });
 
-describe("HttpResponse", function() {
-    it("should accept an HttpRequest to constructor", function() {
+describe("Response", function() {
+    it("should accept an Request to constructor", function() {
         var ua = annie.createUserAgent(),
             session = ua.createSession(),
             req = session.createRequest(),
-            res = new HttpResponse(req);
+            res = new Response(req);
         
         expect(res.userAgent).to.be(ua);
         expect(res.session).to.be(session);
@@ -234,25 +234,25 @@ describe("HttpResponse", function() {
     });
     
     describe(".create", function() {
-        it("should return a new HttpResponse instance", function() {
-            expect(HttpResponse.create()).to.be.an(HttpResponse);
+        it("should return a new Response instance", function() {
+            expect(Response.create()).to.be.an(Response);
         });
         
         describe("(number)", function() {
             it("should set the version if less than 100", function() {
-                var res = HttpResponse.create(1.1);
+                var res = Response.create(1.1);
                 expect(res.version).to.be("1.1");
             });
             
             it("should set the status if above 100", function() {
-                var res = HttpResponse.create(404);
+                var res = Response.create(404);
                 expect(res.status).to.be(404);
             });
         });
         
         describe("(number, number)", function() {
             it("should set the version and status", function() {
-                var res = HttpResponse.create(1.1, 409);
+                var res = Response.create(1.1, 409);
                 expect(res.version).to.be("1.1");
                 expect(res.status).to.be(409);
             });
@@ -260,14 +260,14 @@ describe("HttpResponse", function() {
         
         describe("{object}", function() {
             it("should set headers", function() {
-                var res = HttpResponse.create({Etag: "foo"});
+                var res = Response.create({Etag: "foo"});
                 expect(res.getHeader("Etag")).to.be("foo");
             });
         });
         
         describe("(string)", function() {
             it("should set response data", function() {
-                var res = HttpResponse.create("foo");
+                var res = Response.create("foo");
                 expect(res.data).to.be("foo");
             });
         });
@@ -276,7 +276,7 @@ describe("HttpResponse", function() {
     describe(".statusLine", function() {
         it("should derive from status and version", function() {
             var req = annie.createRequest(),
-                res = new HttpResponse(req);
+                res = new Response(req);
             
             res.version = "1.0";
             res.status = 404;
