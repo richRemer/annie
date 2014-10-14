@@ -7,7 +7,7 @@
     "test": "mocha"
   },
   "dependencies": {
-    "propertize": "~1"
+    "propertize": "^1.3"
   },
   "devDependencies": {
     "mocha": "~1",

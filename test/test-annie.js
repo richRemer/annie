@@ -98,6 +98,58 @@ describe("HttpRequest", function() {
         it("should return a new HttpRequest instance", function() {
             expect(HttpRequest.create()).to.be.an(HttpRequest);
         });
+        
+        describe("(string)", function() {
+            it("should set the request URL", function() {
+                var req = HttpRequest.create("http://example.com/foo?bar");
+                expect(req.host).to.be("example.com");
+                expect(req.path).to.be("/foo");
+                expect(req.query).to.be("bar");
+            });
+        });
+        
+        describe("(string, string)", function() {
+            it("should set the request method and URL", function() {
+                var req = HttpRequest.create("POST", "http://example.com/foo");
+                expect(req.method).to.be("POST");
+                expect(req.host).to.be("example.com");
+            });
+        });
+        
+        describe("(string, string, string)", function() {
+            it("should set the request method, body, and URL", function() {
+                var method = "POST",
+                    data = "Blargh!",
+                    url = "http://example.com/foo",
+                    req = HttpRequest.create(method, data, url);
+
+                expect(req.method).to.be(method);
+                expect(req.data).to.be(data);
+                expect(req.host).to.be("example.com");
+            });
+        });
+        
+        describe("(string, object)", function() {
+            it("should set request headers", function() {
+                var headers = {"Content-Type": "text/xml"},
+                    url = "http://example.com/foo",
+                    req = HttpRequest.create(url, headers);
+                
+                expect(req.getHeader("Content-Type")).to.be("text/xml");
+                expect(req.host).to.be("example.com");
+            });
+        });
+    });
+
+    describe(".getHeader", function() {
+        it("should return header value as string", function() {
+            var req = annie.createRequest();
+            req.addHeader("foo", "bar");
+            req.addHeader("bar", "foo");
+            req.addHeader("bar", "baz");
+            expect(req.getHeader("foo")).to.be("bar");
+            expect(req.getHeader("bar")).to.be("foo,baz");
+        });
     });
 
     describe(".getHeaderString", function() {
