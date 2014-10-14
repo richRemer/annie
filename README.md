@@ -1,7 +1,7 @@
 annie HTTP Client Library
 =========================
 The `annie` library provides objects for making HTTP requests.  It includes
-several classes: `UserAgent`, `Session`, `HttpMessage`, `HttpRequest`, and
+several classes: `UserAgent`, `Session`, `Message`, `HttpRequest`, and
 `HttpResponse`.
 
 Quick Examples
