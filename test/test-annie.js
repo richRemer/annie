@@ -215,7 +215,8 @@ describe("HttpRequest", function() {
             req.host = "foo.com";
             req.path = "/foo";
             req.query = "foo";
-            expect(req.uri).to.be("http://foo.com/foo?foo");
+            req.port = 42;
+            expect(req.uri).to.be("http://foo.com:42/foo?foo");
         });
     });
 });
