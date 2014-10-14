@@ -119,11 +119,9 @@ describe("HttpRequest", function() {
         });
         
         describe("(string)", function() {
-            it("should set the request URL", function() {
+            it("should set the request URI", function() {
                 var req = HttpRequest.create("http://example.com/foo?bar");
-                expect(req.host).to.be("example.com");
-                expect(req.path).to.be("/foo");
-                expect(req.query).to.be("bar");
+                expect(req.uri).to.be("http://example.com/foo?bar");
             });
         });
         
@@ -202,6 +200,22 @@ describe("HttpRequest", function() {
             expect(headers["user-agent"]).to.be(ua.getHeader("user-agent"));
             expect(headers["foo"]).to.be(session.getHeader("foo"));
             expect(headers["bar"]).to.be(req.getHeader("bar"));
+        });
+    });
+    
+    describe(".uri", function() {
+        it("should be composed of component props", function() {
+            var req = annie.createRequest();
+
+            req.uri = "http://host/path?query";
+            expect(req.host).to.be("host");
+            expect(req.path).to.be("/path");
+            expect(req.query).to.be("query");
+            
+            req.host = "foo.com";
+            req.path = "/foo";
+            req.query = "foo";
+            expect(req.uri).to.be("http://foo.com/foo?foo");
         });
     });
 });
