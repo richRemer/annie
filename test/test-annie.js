@@ -222,6 +222,40 @@ describe("HttpResponse", function() {
         it("should return a new HttpResponse instance", function() {
             expect(HttpResponse.create()).to.be.an(HttpResponse);
         });
+        
+        describe("(number)", function() {
+            it("should set the version if less than 100", function() {
+                var res = HttpResponse.create(1.1);
+                expect(res.version).to.be("1.1");
+            });
+            
+            it("should set the status if above 100", function() {
+                var res = HttpResponse.create(404);
+                expect(res.status).to.be(404);
+            });
+        });
+        
+        describe("(number, number)", function() {
+            it("should set the version and status", function() {
+                var res = HttpResponse.create(1.1, 409);
+                expect(res.version).to.be("1.1");
+                expect(res.status).to.be(409);
+            });
+        });
+        
+        describe("{object}", function() {
+            it("should set headers", function() {
+                var res = HttpResponse.create({Etag: "foo"});
+                expect(res.getHeader("Etag")).to.be("foo");
+            });
+        });
+        
+        describe("(string)", function() {
+            it("should set response data", function() {
+                var res = HttpResponse.create("foo");
+                expect(res.data).to.be("foo");
+            });
+        });
     });
 
     describe(".statusLine", function() {
