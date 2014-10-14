@@ -259,7 +259,7 @@ describe("HttpResponse", function() {
     });
 
     describe(".statusLine", function() {
-        it("should derive from response status", function() {
+        it("should derive from status and version", function() {
             var req = annie.createRequest(),
                 res = new HttpResponse(req);
             
