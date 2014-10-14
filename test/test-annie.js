@@ -4,6 +4,8 @@ var http = require("http"),
     Session = require("../lib/session"),
     Request = require("../lib/request"),
     Response = require("../lib/response"),
+    Result = require("../lib/result"),
+    Promise = require("es6-promise").Promise,
     expect = require("expect.js");
     
 describe("annie", function() {
@@ -284,5 +286,12 @@ describe("Response", function() {
             res.status = 200;
             expect(res.statusLine).to.be("HTTP/1.0 200 OK");
         });
+    });
+});
+
+describe("Result", function() {
+    it("should extend from Promise", function() {
+        var result = new Result();
+        expect(result).to.be.a(Promise);
     });
 });
