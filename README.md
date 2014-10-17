@@ -45,9 +45,94 @@ function updateEntity(entityUri, key, val, done) {
     })
     
     // pass along any js/HTTP errors
-    .fail(done);
+    .failure(done);
 }
 ```
+
+The above example uses `post`, `get`, and `put` from the `annie` module.  There
+is a corresponding `annie` function for each standard HTTP method.  Each of
+these functions takes an optional callback which will receive a successful
+response (2xx status).  If the response is not a success, the `Response`
+object will be thrown.  In turn, any thrown value (whether they be `Error` or
+`Response` objects or something else) will be handed off the `failure`
+callback.
+
+### Handling non-successful response
+
+Now imagine you want to extend the previous function to create a new resource
+if one does not exist already.  The following example does just that.
+
+```js
+// ... snip ... (q.v., previous example)
+
+        // GET existing resource entity and update the key/val
+        annie.get(entityUri, headers, function(res) {
+            var entity = JSON.parse(res.data);
+            entity[key] = val;
+            headers["If-Match"] = res.getHeader("ETag");
+            
+            // conditional PUT to update resource entity
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });
+        })
+        
+        // catch 404 Not Found and create new resource
+        .status(404, function(res) {
+            var entity = {};
+            entity[key] = val;
+            headers["If-None-Match"] = "*";
+
+            // conditional PUT to update resource entity
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });
+        });
+
+// ... snip ... (q.v., previous example)
+```
+
+In this example, the `status` function is called on the `Result` returned from
+`get`.  This function adds a response handler for `404 Not Found` responses.
+
+### Handle an arbitrary response
+
+There's some unnecessary duplication in the previous example.  The callbacks
+for both the `get` function and the `status` function are almost identical.  In
+order to avoid this, you decide to put them both in the same function.
+
+```js
+// ... snip ... (q.v., previous example)
+
+        // GET existing resource if available and update/create new key/val
+        annie.get(entityUri, headers, function(err, res) {
+            var entity = {};
+
+            if (err) throw err;
+            
+            if (res.isSuccess()) {
+                entity = JSON.parse(res.data);
+                headers["If-Match"] = res.getHeader("ETag");
+            } else if (res.status === 404) {
+                headers["If-None-Match"] = "*";
+            } else throw res;
+
+            // conditional PUT to update resource entity
+            entity[key] = val;
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });            
+        });
+
+// ... snip ... (q.v., previous example)
+```
+
+In this example, because the `get` callback has two arguments, it will be
+passed any `Error` or the result `Response`.  Notice where the `Response` is
+thrown.  This lets `annie` know that this handler will not handle the response
+and it should be passed along to the final `failure` handler, which in turn
+passes the `Response` to the `done` callback as the first argument, indicating
+an error.
 
 UserAgent
 ---------
