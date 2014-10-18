@@ -150,13 +150,13 @@ following example.
         .success(function(res) {
             headers["If-Match"] = res.getHeader("ETag");
             return JSON.parse(res.data);
-        });
+        })
 
         // setup headers for new resource and create new entity
         .status(404, function(res) {
             headers["If-None-Match"] = "*";
             return {};
-        });
+        })
 
         // now PUT the updated/created entity
         .then(function(entity) {
