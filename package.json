@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "propertize": "^1.3",
-    "objektify": "~1"
+    "objektify": "~1",
+    "es6-promise": "~2"
   },
   "devDependencies": {
     "mocha": "~1",
