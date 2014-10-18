@@ -134,6 +134,51 @@ and it should be passed along to the final `failure` handler, which in turn
 passes the `Response` to the `done` callback as the first argument, indicating
 an error.
 
+### Chaining operations
+
+After looking at the DRY'd result, you decide it's a bit ugly.  You think you
+can refactor it to make the flow a bit more clear.  You give it a go with the
+following example.
+
+```js
+// ... snip ... (q.v., previous example)
+
+        // GET existing resource if available and update/create new key/val
+        annie.get(entityUri, headers)
+
+        // setup headers and pass existing entity to next step
+        .success(function(res) {
+            headers["If-Match"] = res.getHeader("ETag");
+            return JSON.parse(res.data);
+        });
+
+        // setup headers for new resource and create new entity
+        .status(404, function(res) {
+            headers["If-None-Match"] = "*";
+            return {};
+        });
+
+        // now PUT the updated/created entity
+        .then(function(entity) {
+            entity[key] = val;
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });
+        });
+
+// ... snip ... (q.v., previous example)
+```
+
+With the `success` method, we handle 2xx responses as in the initial example.
+There is no difference between passing the success callback to the `get` method
+or to the `success` method of the `get` return value.  In either case, the call
+to the `status` method functions just as before, handling the 404 response.  In
+addition to the methods already presented, `then` is available and functions as
+described in `es6-promises` (the new Promise standard for JS available as a
+Node module).  Each response handler sets up the header and entity as needed,
+then returns the entity.  This returned value gets passed to the `then`
+callback, which performs the common task of PUTting the entity.
+
 UserAgent
 ---------
 The `UserAgent` class provides settings which apply to all requests.  The
