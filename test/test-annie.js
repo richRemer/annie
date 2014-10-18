@@ -4,7 +4,10 @@ var http = require("http"),
     Session = require("../lib/session"),
     Request = require("../lib/request"),
     Response = require("../lib/response"),
-    expect = require("expect.js");
+    Result = require("../lib/result"),
+    Promise = require("es6-promise").Promise,
+    expect = require("expect.js"),
+    sinon = require("sinon");
     
 describe("annie", function() {
     it("should export UserAgent.create as createUserAgent", function() {
@@ -235,7 +238,7 @@ describe("Response", function() {
     
     describe(".create", function() {
         it("should return a new Response instance", function() {
-            expect(Response.create()).to.be.an(Response);
+            expect(Response.create()).to.be.a(Response);
         });
         
         describe("(number)", function() {
@@ -283,6 +286,48 @@ describe("Response", function() {
             expect(res.statusLine).to.be("HTTP/1.0 404 Not Found");
             res.status = 200;
             expect(res.statusLine).to.be("HTTP/1.0 200 OK");
+        });
+    });
+});
+
+describe("Result", function() {
+    it("should extend from Promise", function() {
+        var result = new Result(function(resolve, reject) {});
+        expect(result).to.be.a(Promise);
+    });
+    
+    describe(".addRule", function() {
+        it("should handle filtered fulfilled Response", function(done) {
+            // 200 OK response
+            var response = Response.create(200);
+
+            // create a result which will resolve to a 200 OK Response
+            var result = new Result(function(resolve, reject) {
+                    resolve(response);
+                });
+            
+            // spy on filters to confirm they are called in correct order
+            var filter404 = function(res) {return res.status === 404;},
+                filter200 = function(res) {return res.status === 200;},
+                spy404 = sinon.spy(filter404),
+                spy200 = sinon.spy(filter200);
+            
+            // should get called after matching rule
+            var fulfilled = function(res) {
+                    expect(spy404.calledOnce).to.be(true);
+                    expect(spy200.calledOnce).to.be(true);
+                    expect(res).to.be(response);
+                    done();
+                };
+            
+            // add rules
+            // 1. check against 404 filter (no match)
+            // 2. skip 404 handler
+            // 3. check against 200 filter (match)
+            // 4. call 200 handler
+            result
+                .addRule(spy404, fulfilled)
+                .addRule(spy200, fulfilled);
         });
     });
 });
