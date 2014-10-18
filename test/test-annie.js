@@ -329,5 +329,16 @@ describe("Result", function() {
                 .addRule(spy404, fulfilled)
                 .addRule(spy200, fulfilled);
         });
+        
+        it("should fail if called after then/catch", function() {
+            var result = new Result(function(resolve, reject) {
+                    resolve(Response.create(200));
+                }),
+                fulfilled = sinon.spy();
+            
+            result.then(fulfilled);
+            expect(result.addRule).withArgs(function(){}, function(){})
+                .to.throwError();
+        });
     });
 });
