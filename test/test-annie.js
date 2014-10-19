@@ -196,6 +196,16 @@ describe("Request", function() {
         });
     });
     
+    describe(".addHeaderString", function() {
+        it("should add headers in HTTP format to header provider", function() {
+            var req = annie.createRequest();
+
+            req.addHeaderString("foo: bar\r\nbar: baz");
+            expect(req.getHeader("foo")).to.be("bar");
+            expect(req.getHeader("bar")).to.be("baz");
+        });
+    });
+    
     describe(".uri", function() {
         it("should be composed of component props", function() {
             var req = annie.createRequest();
