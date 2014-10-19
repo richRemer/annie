@@ -3,6 +3,11 @@ annie HTTP Client Library
 The `annie` library provides objects for making HTTP requests.  It includes
 several classes: `UserAgent`, `Session`, `Message`, `Request`, and `Response`.
 
+TODO
+----
+ * change normalization of headers to traditional word caps
+   (*e.g.*, content-type becomes Content-Type)
+
 Quick Examples
 --------------
 
