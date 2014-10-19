@@ -41,7 +41,7 @@ describe("UserAgent", function() {
     });
 
     describe(".createRequest", function() {
-        it("should return an Request", function() {
+        it("should return a Request", function() {
             var ua = annie.createUserAgent(),
                 entity = JSON.stringify({foo: 42}),
                 req = ua.createRequest("PUT", entity, "http://example.com");
@@ -50,6 +50,17 @@ describe("UserAgent", function() {
             expect(req.userAgent).to.be(ua);
             expect(req.host).to.be("example.com");
             expect(JSON.parse(req.data).foo).to.be(42);
+        });
+        
+        it("should copy UserAgent headers to Request", function() {
+            var ua = annie.createUserAgent(),
+                req;
+                
+            ua.setHeader("foo", "bar");
+            ua.setHeader("bar", "baz");
+            req = ua.createRequest({bar: "biff"});
+            expect(req.getHeader("foo")).to.be("bar");
+            expect(req.getHeader("bar")).to.be("biff");
         });
     });
 });
@@ -68,19 +79,6 @@ describe("Session", function() {
         });
     });
 
-    describe(".getAllHeaders", function() {
-        it("should merge headers from user-agent with session", function() {
-            var session = annie.createSession({foo: "bar"}),
-                headers = session.getAllHeaders(),
-                ua = session.userAgent;
-            
-            expect(ua.getHeader("user-agent")).to.be.ok();
-            expect(session.getHeader("foo")).to.be.ok();
-            expect(session.getHeader("user-agent")).to.not.be.ok();
-            expect(headers["user-agent"]).to.be(ua.getHeader("user-agent"));
-        });
-    });
-
     describe(".createRequest", function() {
         it("should return an Request", function() {
             var ua = annie.createUserAgent(),
@@ -94,6 +92,17 @@ describe("Session", function() {
             expect(req.userAgent).to.be(ua);
             expect(req.host).to.be("example.com");
             expect(JSON.parse(req.data).foo).to.be(42);
+        });
+        
+        it("should copy Session headers to Request", function() {
+            var sess = annie.createSession(),
+                req;
+                
+            sess.setHeader("foo", "bar");
+            sess.setHeader("bar", "baz");
+            req = sess.createRequest({bar: "biff"});
+            expect(req.getHeader("foo")).to.be("bar");
+            expect(req.getHeader("bar")).to.be("biff");
         });
     });
 });
@@ -184,25 +193,6 @@ describe("Request", function() {
             expect(headers).to.contain("foo: you");
             expect(headers).to.contain("bar: baz");
             expect(headers).to.contain("\r\n");
-        });
-    });
-
-    describe(".getAllHeaders", function() {
-        it("should merge UA/session headers", function() {
-            var session = annie.createSession({foo: "bar"}),
-                req = session.createRequest({bar: "baz"}),
-                headers = req.getAllHeaders(),
-                ua = session.userAgent;
-            
-            expect(ua.getHeader("user-agent")).to.be.ok();
-            expect(session.getHeader("user-agent")).to.not.be.ok();
-            expect(session.getHeader("foo")).to.be("bar");
-            expect(req.getHeader("user-agent")).to.not.be.ok();
-            expect(req.getHeader("foo")).to.not.be.ok();
-            expect(req.getHeader("bar")).to.be("baz");
-            expect(headers["user-agent"]).to.be(ua.getHeader("user-agent"));
-            expect(headers["foo"]).to.be(session.getHeader("foo"));
-            expect(headers["bar"]).to.be(req.getHeader("bar"));
         });
     });
     
