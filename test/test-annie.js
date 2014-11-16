@@ -5,6 +5,7 @@ var http = require("http"),
     Request = require("../lib/request"),
     Response = require("../lib/response"),
     Result = require("../lib/result"),
+    Readable = require("stream").Readable,
     Promise = require("es6-promise").Promise,
     expect = require("expect.js"),
     sinon = require("sinon");
@@ -127,13 +128,44 @@ describe("Request", function() {
     
     describe(".create", function() {
         it("should return a new Request instance", function() {
-            expect(Request.create()).to.be.an(Request);
+            expect(Request.create()).to.be.a(Request);
         });
         
         describe("(string)", function() {
             it("should set the request URI", function() {
                 var req = Request.create("http://example.com/foo?bar");
                 expect(req.uri).to.be("http://example.com/foo?bar");
+            });
+        });        
+        
+        describe("(Readable, string)", function() {
+            it("should set the request body and URI", function() {
+                var s = new Readable(),
+                    req = Request.create(s, "http://example.com/foo");
+                    
+                expect(req.data).to.be(s);
+                expect(req.uri).to.be("http://example.com/foo");
+            });
+        });
+
+        describe("(string, Readable)", function() {
+            it("should set the request method and body", function() {
+                var s = new Readable(),
+                    req = Request.create("POST", s);
+                    
+                expect(req.method).to.be("POST");
+                expect(req.data).to.be(s);
+            });
+        });
+        
+        describe("(string, Readable, string)", function() {
+            it("should set the request method, body, and URI", function() {
+                var s = new Readable(),
+                    req = Request.create("PUT", s, "http://example.com/foo");
+                
+                expect(req.method).to.be("PUT");
+                expect(req.data).to.be(s);
+                expect(req.uri).to.be("http://example.com/foo");
             });
         });
         
