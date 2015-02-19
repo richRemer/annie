@@ -184,6 +184,57 @@ Node module).  Each response handler sets up the header and entity as needed,
 then returns the entity.  This returned value gets passed to the `then`
 callback, which performs the common task of PUTting the entity.
 
+### Full Example
+
+```js
+var annie = require("annie");
+const AUTH_URL = "https://example.com/...",
+      AUTH_IDENT = "ServiceUser",
+      AUTH_SECRET = "P455wurd";
+
+/**
+ * Update an existing resource entity, changing a single key to a new value.
+ * @param {string} entityUri    URI of the resource entity
+ * @param {string} key          Entity key to update
+ * @param {*} val               New value for the key
+ * @param {function} done       Called with (err, entity)
+ */
+function updateEntity(entityUri, key, val, done) {
+    var headers = {"X-Ident": AUTH_IDENT, "X-Secret": AUTH_SECRET};
+
+    // POST credentials to authentication service and handle success (2xx)
+    annie.post(AUTH_URL, headers, function(res) {
+        headers = {"X-Token": res.getHeader("X-Token")};
+
+        // GET existing resource if available and update/create new key/val
+        annie.get(entityUri, headers)
+
+        // setup headers and pass existing entity to next step
+        .success(function(res) {
+            headers["If-Match"] = res.getHeader("ETag");
+            return JSON.parse(res.data);
+        })
+
+        // setup headers for new resource and create new entity
+        .status(404, function(res) {
+            headers["If-None-Match"] = "*";
+            return {};
+        })
+
+        // now PUT the updated/created entity
+        .then(function(entity) {
+            entity[key] = val;
+            annie.put(entity, entityUri, headers, function(res) {
+                done(null, entity);
+            });
+        });
+    })
+    
+    // pass along any js/HTTP errors
+    .failure(done);
+}
+```
+
 UserAgent
 ---------
 The `UserAgent` class provides settings which apply to all requests.  The
@@ -234,7 +285,7 @@ Request
 -------
 The `Request` class issues requests and produces `Response` objects.
 
-### Creating an `Request`
+### Creating a `Request`
 
 ```js
 var annie = require("annie"),
@@ -255,10 +306,10 @@ req = sess.createRequest();
 
 Response
 --------
-An `Response` object is created by calling the `send` method of a configured
+A `Response` object is created by calling the `send` method of a configured
 `Request` object.
 
-### Getting an `Response`
+### Getting a `Response`
 
 ```js
 var req = annie.createRequest();
