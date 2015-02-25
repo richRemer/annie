@@ -242,11 +242,13 @@ describe("Request", function() {
         it("should be composed of component props", function() {
             var req = annie.createRequest();
 
-            req.uri = "http://host/path?query";
+            req.uri = "https://host/path?query";
+            expect(req.protocol).to.be("https:");
             expect(req.host).to.be("host");
             expect(req.path).to.be("/path");
             expect(req.query).to.be("query");
             
+            req.protocol = "http:";
             req.host = "foo.com";
             req.path = "/foo";
             req.query = "foo";
